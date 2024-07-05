@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Experiment 1 C</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
+
+      * {
+        font-weight: 400;
+        font-family: "Open Sans", sans-serif;
+        box-sizing: border-box;
+        margin: 0;
+      }
+
+      body {
+        background-image: linear-gradient(45deg, rgb(153, 228, 130), rgb(255, 137, 175));
+        height: 100vh;
+      }
+
+      .container {
+        height: 98vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .heading{
+        font-weight: 100;
+        font-size: 3rem;
+        margin-bottom: 1.8rem;
+        color: rgb(153, 43, 226);
+
+      }
+
+      .keypad {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: repeat(4, 1fr);
+        box-sizing: border-box;
+        width: 100%;
+      }
+
+      /* 
+        .button:nth-child(12) {
+            grid-column: 1 / 2;
+        }
+
+        .key:nth-child(13) {
+            grid-column: 2 / 3;
+        }
+
+        .key:nth-child(14) {
+            grid-column: 3 / 4;
+        } 
+        */
+      .key {
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        border: 1px solid rgba(255, 255, 255, 0);
+        transition: 0.15s ease background-color;
+      }
+
+      .key:hover {
+        background-color: rgba(220, 220, 220, 0.979);
+        color: rgb(0, 0, 0);
+        transition: 0.15s ease background-color;
+      }
+
+      #input_text {
+        margin-bottom: 1.5rem;
+        width: 100%;
+        padding: 1.1rem;
+        font-size: 1.5rem;
+        box-sizing: border-box;
+        border-radius: 10px;
+        background-color: whitesmoke;
+        border: 1px solid rgba(0, 0, 0, 0);
+        transition: 0.2s ease background-color;
+        text-align: right;
+      }
+
+      #input_text:hover {
+        background-color: rgb(196, 245, 255);
+        transition: 0.2s ease background-color;
+      }
+
+      .calculator {
+        width: 40vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #display_text {
+        margin-top: 0;
+        margin-bottom: 0;
+        display: none;
+      }
+    </style>
+    <script>
+      function sendExpression(expression) {
+        // const inputText = document.getElementById("input_text").value;
+
+        let formData = new FormData();
+
+        formData.append("input_text", expression);
+
+        // sending an AJAX request to route /exp1c
+        fetch("/calculate", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const displayParagraph = document.getElementById("display_text");
+            const resultParagraph = document.getElementById("result_text");
+
+            // check the response status
+            if (data.status === "success") {
+              resultParagraph.style.display = "block";
+              resultParagraph.textContent = data.message;
+              displayParagraph.style.display = "none";
+              displayParagraph.textContent = "";
+            } else {
+              resultParagraph.style.display = "none";
+              resultParagraph.textContent = "";
+              displayParagraph.style.display = "block";
+              displayParagraph.textContent = data.message;
+            }
+          })
+          .catch((err) => {
+            console.error("Error:", err);
+            const displayParagraph = document.getElementById("display_text");
+            displayParagraph.style.display = "block";
+            displayParagraph.textContent = "An error occurred";
+          });
+      }
+
+      function handleButtonClick(event) {
+        const button = event.target;
+
+        const inputField = document.getElementById("input_text");
+        const resultField = document.getElementById("result_text");
+
+        // when the AC button is clicked
+        if (button.id === "clear") {
+          inputField.value = "";
+          resultField.value = "";
+          document.getElementById("display_text").style.display = "none";
+          resultField.style.display = "none";
+        } else if (button.id === "equal") {
+          // when the '=' button is clicked, trigger form submission
+          sendExpression(inputField.value);
+        } else {
+          // on eevry other button press, append the button's value to the input field
+          inputField.value += button.textContent;
+        }
+      }
+
+      // add event listeners to the buttons only after the DOM content is loaded
+      document.addEventListener("DOMContentLoaded", () => {
+        const buttons = document.querySelectorAll(".key");
+        buttons.forEach((button) => {
+          button.addEventListener("click", handleButtonClick);
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <form class="container">
+      <h1 class="heading">Basic calci bro</h1>
+      <div class="calculator">
+        <input id="input_text" name="input_text" type="text" />
+        <p id="result_text" name="result_text">{{result_text}}</p>
+        <p id="display_text" name="display_text">{{display_text}}</p>
+        <br />
+        <div class="keypad">
+          <button class="key" id="1" type="button">1</button>
+          <button class="key" id="2" type="button">2</button>
+          <button class="key" id="3" type="button">3</button>
+          <button class="key" id="plus" type="button">+</button>
+          <button class="key" id="4" type="button">4</button>
+          <button class="key" id="5" type="button">5</button>
+          <button class="key" id="6" type="button">6</button>
+          <button class="key" id="minus" type="button">-</button>
+          <button class="key" id="7" type="button">7</button>
+          <button class="key" id="8" type="button">8</button>
+          <button class="key" id="9" type="button">9</button>
+          <button class="key" id="slash" type="button">/</button>
+          <button class="key" id="clear" type="button">AC</button>
+          <button class="key" id="0" type="button">0</button>
+          <button class="key" id="star" type="button">*</button>
+          <button class="key" type="button" id="equal">=</button>
+        </div>
+      </div>
+    </form>
+  </body>
+</html>
+
+<!-- 
+
+instead of utiliisng promises, this how it would look using async/await
+
+async function sendExpression() {
+    try {
+        let inputText = document.getElementById('input_text').value;
+        
+        let formData = new FormData();
+
+        formData.append('input_text', inputText);
+
+        // send an AJAX request
+        let response = await fetch('/exp1c', {
+            method: 'POST',
+            body: formData
+        });
+
+        // check if the response is ok (status code would be  in the range 200-299)
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        // parse the JSON response
+        let data = await response.json();
+
+        let displayParagraph = document.getElementById('display_text');
+
+        // check the response status
+        if (data.status === 'success') {
+            displayParagraph.style.display = 'block';
+            displayParagraph.textContent = data.message;
+        } else {
+            displayParagraph.style.display = 'block';
+            displayParagraph.textContent = data.message;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        let displayParagraph = document.getElementById('display_text');
+        displayParagraph.style.display = 'block';
+        displayParagraph.textContent = 'An error occurred';
+    }
+}
+
+
+-->
