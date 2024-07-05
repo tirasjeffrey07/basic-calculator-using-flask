@@ -38,7 +38,7 @@ This is a simple calculator web application built using Flask, which allows user
    ```bash
    python app.py
 
-   Open http://localhost:5000 in your browser to view the app.
+Open http://localhost:5000 in your browser to view the app.
 
 ## Contributing
 
